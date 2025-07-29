@@ -1,11 +1,11 @@
 const express = require('express');
 const fs = require('fs-extra');
-const { exec } = require('child_process');
-const pino = require('pino');
-const { Boom } = require('@hapi/boom');
+const { exec } = require("child_process");
+let router = express.Router();
+const pino = require("pino");
+const { Boom } = require("@hapi/boom");
 
-const MESSAGE = process.env.MESSAGE || `*𝐌𝐚𝐡𝐚𝐜𝐡𝐢-𝐗𝐃 𝐒𝐮𝐜𝐜𝐞𝐬𝐟𝐮𝐥𝐥𝐲 𝐏𝐚𝐢𝐫𝐞𝐝* 
-
+const MESSAGE = process.env.MESSAGE || `
 𝐉𝐨𝐢𝐧 𝐎𝐮𝐫 𝐎𝐟𝐟𝐢𝐜𝐢𝐚𝐥 𝐂𝐡𝐚𝐧𝐧𝐞𝐥𝐬
 
 > https://whatsapp.com/channel/0029Vb2J9C91dAw7vxA75y2V 
@@ -13,7 +13,8 @@ const MESSAGE = process.env.MESSAGE || `*𝐌𝐚𝐡𝐚𝐜𝐡𝐢-𝐗𝐃 �
 > https://whatsapp.com/channel/0029VbBD719C1Fu3FOqzhb2R 
 
 > 𝐌𝐚𝐡𝐚𝐜𝐡𝐢-𝐗𝐃 | 𝐖𝐡𝐚𝐭𝐬𝐚𝐩𝐩 𝐚𝐮𝐭𝐨𝐦𝐚𝐭𝐢𝐨𝐧 
-> 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐖𝐄𝐄𝐃𝐱𝐓𝐄𝐂𝐇`;
+> 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐖𝐄𝐄𝐃𝐱𝐓𝐄𝐂𝐇
+`;
 
 const { upload } = require('./mega');
 const {
@@ -23,139 +24,131 @@ const {
   makeCacheableSignalKeyStore,
   Browsers,
   DisconnectReason
-} = require('@whiskeysockets/baileys');
+} = require("@whiskeysockets/baileys");
 
-const router = express.Router();
-
-// Clear auth folder on load
-const authFolder = './auth_info_baileys';
-if (fs.existsSync(authFolder)) {
-  fs.emptyDirSync(authFolder);
+// Ensure the directory is empty when the app starts
+if (fs.existsSync('./auth_info_baileys')) {
+  fs.emptyDirSync(__dirname + '/auth_info_baileys');
 }
 
 router.get('/', async (req, res) => {
-  const num = req.query.number?.toString().replace(/[^0-9]/g, '');
-  if (!num) return res.status(400).json({ error: 'Valid number is required' });
+  let num = req.query.number;
   
-  // Prevent multiple responses
-  let responded = false;
-  const sendResponse = (data) => {
-    if (!responded && !res.headersSent) {
-      res.json(data);
-      responded = true;
-    }
-  };
-  
-  const startBot = async () => {
+  async function SUHAIL() {
+    const { state, saveCreds } = await useMultiFileAuthState(`./auth_info_baileys`);
     try {
-      await fs.ensureDir(authFolder);
-      const { state, saveCreds } = await useMultiFileAuthState(authFolder);
-      
-      const sock = makeWASocket({
+      let Smd = makeWASocket({
         auth: {
           creds: state.creds,
-          keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'fatal' })),
+          keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
         },
         printQRInTerminal: false,
-        logger: pino({ level: 'silent' }),
-        browser: Browsers.macOS('Safari'),
+        logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+        browser: Browsers.macOS("Safari"),
       });
       
-      // On successful connection
-      sock.ev.on('connection.update', async ({ connection, lastDisconnect }) => {
-        if (connection === 'open') {
-          console.log('Successfully connected to WhatsApp MD');
-          
+      if (!Smd.authState.creds.registered) {
+        await delay(1500);
+        num = num.replace(/[^0-9]/g, '');
+        const code = await Smd.requestPairingCode(num);
+        if (!res.headersSent) {
+          await res.send({ code });
+        }
+      }
+      
+      Smd.ev.on('creds.update', saveCreds);
+      Smd.ev.on("connection.update", async (s) => {
+        const { connection, lastDisconnect } = s;
+        
+        if (connection === "open") {
           try {
-            await delay(3000);
+            await delay(10000);
+            if (fs.existsSync('./auth_info_baileys/creds.json'));
             
-            const credsPath = `${authFolder}/creds.json`;
-            if (!fs.existsSync(credsPath)) {
-              console.error('Auth file not found after connection');
-              return;
-            }
+            const auth_path = './auth_info_baileys/';
+            let user = Smd.user.id;
             
-            // Generate random ID for file
-            const randomMegaId = (length = 6, numberLength = 4) => {
-              const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            function randomMegaId(length = 6, numberLength = 4) {
+              const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
               let result = '';
               for (let i = 0; i < length; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
               }
               const number = Math.floor(Math.random() * Math.pow(10, numberLength));
               return `${result}${number}`;
-            };
+            }
             
-            // Upload to MEGA
-            const fileStream = fs.createReadStream(credsPath);
-            const megaUrl = await upload(fileStream, `${randomMegaId()}.json`);
+            const mega_url = await upload(fs.createReadStream(auth_path + 'creds.json'), `${randomMegaId()}.json`);
+            const Id_session = mega_url.replace('https://mega.nz/file/', '');
+            const Scan_Id = Id_session;
             
-            // Extract session ID (remove base channel if present)
-            const baseUrl = 'https://whatsapp.com/channel/0029VbBD719C1Fu3FOqzhb2R ';
-            const sessionId = megaUrl.startsWith(baseUrl) ?
-              megaUrl.slice(baseUrl.length) :
-              megaUrl;
+            // Send session ID
+            let msgsss = await Smd.sendMessage(user, { text: Scan_Id });
             
-            // Send messages
-            const userJid = sock.user.id;
-            const msgInfo = await sock.sendMessage(userJid, { text: sessionId });
-            await sock.sendMessage(userJid, {
-              image: { url: 'https://files.catbox.moe/qyph7m.jpg' },
-              caption: MESSAGE
-            }, { quoted: msgInfo });
+            // Send banner image with caption as a forwarded message from the newsletter channel
+            await Smd.sendMessage(user, {
+              image: { url: "https://whatsapp.com/channel/0029VbBD719C1Fu3FOqzhb2R" },
+              caption: MESSAGE,
+              contextInfo: {
+                forwardingScore: 999,
+                isForwarded: true,
+                externalAdReply: {
+                  showAdAttribution: true,
+                  title: "SecUnitDevs",
+                  body: "WhatsApp Channel",
+                  previewType: "PHOTO",
+                  thumbnailUrl: "https://files.catbox.moe/qyph7m.jpg",
+                  mediaType: 1,
+                  mediaUrl: "https://whatsapp.com/channel/0029VbBD719C1Fu3FOqzhb2R",
+                  sourceUrl: "https://whatsapp.com/channel/0029VbBD719C1Fu3FOqzhb2R"
+                }
+              }
+            }, { quoted: msgsss });
             
-            // Cleanup
-            await fs.emptyDir(authFolder);
+            await delay(1000);
+            try { await fs.emptyDirSync(__dirname + '/auth_info_baileys'); } catch (e) {}
             
-          } catch (uploadError) {
-            console.error('Upload or send error:', uploadError);
+          } catch (e) {
+            console.log("Error during file upload or message send: ", e);
           }
+          
+          await delay(100);
+          await fs.emptyDirSync(__dirname + '/auth_info_baileys');
         }
         
-        // Handle disconnection
-        if (connection === 'close') {
-          const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
-          
-          console.log('Connection closed:', DisconnectReason[reason] || reason);
-          
-          if (reason === DisconnectReason.restartRequired) {
-            console.log('Restarting...');
-            exec('pm2 restart qasim');
-          } else if (reason !== DisconnectReason.loggedOut) {
-            setTimeout(() => {
-              if (!responded) startBot().catch(() => exec('pm2 restart qasim'));
-            }, 3000);
+        if (connection === "close") {
+          let reason = new Boom(lastDisconnect?.error)?.output.statusCode;
+          if (reason === DisconnectReason.connectionClosed) {
+            console.log("Connection closed!");
+          } else if (reason === DisconnectReason.connectionLost) {
+            console.log("Connection Lost from Server!");
+          } else if (reason === DisconnectReason.restartRequired) {
+            console.log("Restart Required, Restarting...");
+            SUHAIL().catch(err => console.log(err));
+          } else if (reason === DisconnectReason.timedOut) {
+            console.log("Connection TimedOut!");
           } else {
-            await fs.emptyDir(authFolder);
+            console.log('Connection closed with bot. Please run again.');
+            console.log(reason);
+            await delay(5000);
+            exec('pm2 restart qasim');
           }
         }
       });
       
-      // Auth state update
-      sock.ev.on('creds.update', saveCreds);
-      
-      // Wait for pairing
-      if (!state.creds.registered) {
-        await delay(1500);
-        const pairingCode = await sock.requestPairingCode(num);
-        sendResponse({ code: pairingCode });
-      }
-      
     } catch (err) {
-      console.error('Bot initialization error:', err);
-      await fs.emptyDir(authFolder).catch(console.error);
-      
-      if (!responded) {
-        sendResponse({ code: 'Error: Try again in a few minutes.' });
+      console.log("Error in SUHAIL function: ", err);
+      exec('pm2 restart qasim');
+      console.log("Service restarted due to error");
+      SUHAIL();
+      await fs.emptyDirSync(__dirname + '/auth_info_baileys');
+      if (!res.headersSent) {
+        await res.send({ code: "Try After Few Minutes" });
       }
-      
-      // Restart service
-      setTimeout(() => exec('pm2 restart qasim'), 3000);
     }
-  };
+  }
   
-  // Start bot
-  await startBot();
+  await SUHAIL();
 });
 
 module.exports = router;
