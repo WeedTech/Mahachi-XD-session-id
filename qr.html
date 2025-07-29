@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>♔ᗯEEᗪTEᑕᕼ♔ - Scan QR</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0d1b2a, #1b263b);
+      color: #e0e1dd;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      background: rgba(33, 47, 68, 0.7);
+      border-radius: 16px;
+      padding: 30px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid #415a77;
+    }
+    .logo {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: #71c9ce;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      color: #9ecaed;
+      font-weight: 600;
+    }
+    p {
+      color: #a9a9b8;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .qr-box {
+      background: #0d1b2a;
+      border-radius: 12px;
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .loader {
+      border: 4px solid #0d1b2a;
+      border-top: 4px solid #71c9ce;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 0.9rem;
+      color: #778da9;
+    }
+    .footer a {
+      color: #71c9ce;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <i class="fas fa-qrcode"></i> ᴡᴇᴇᴅᴛᴇᴄʜ
+    </div>
+    <h1>♔ ᴍᴀʜᴀᴄʜɪ-хᴅ | ǫʀ ʟᴏɢɪɴ</h1>
+    <p>Scan the QR code below to connect your WhatsApp account.</p>
+
+    <div class="qr-box" id="qrContainer">
+      <div class="loader" id="loader"></div>
+      <img id="qrCode" style="max-width: 100%; display: none;" alt="WhatsApp QR Code"/>
+    </div>
+
+    <p id="status">Generating QR code, please wait...</p>
+
+    <div class="footer">
+      <p>
+        Follow us: 
+        <a href="https://whatsapp.com/channel/0029Vb2J9C91dAw7vxA75y2V" target="_blank">Channel 1</a> | 
+        <a href="https://whatsapp.com/channel/0029VbBD719C1Fu3FOqzhb2R" target="_blank">Channel 2</a>
+      </p>
+      <p style="margin-top: 8px; font-style: italic;">
+        "La meilleure vengeance c'est de leur montrer que ta vie s'améliore après leur départ."
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const qrCode = document.getElementById("qrCode");
+    const loader = document.getElementById("loader");
+    const status = document.getElementById("status");
+    const qrContainer = document.getElementById("qrContainer");
+
+    function fetchQR() {
+      fetch('/qr')
+        .then(async (res) => {
+          if (res.headers.get('content-type').includes('image/png')) {
+            // QR Image received
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            qrCode.src = url;
+            qrCode.style.display = 'block';
+            loader.style.display = 'none';
+            status.textContent = 'QR code generated! Scan within 20 seconds.';
+          } else {
+            // Fallback or error
+            const text = await res.text();
+            if (text.includes("<html") || res.status !== 200) {
+              throw new Error("Invalid response");
+            }
+            throw new Error("No QR code returned");
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to load QR:", err);
+          status.textContent = "Failed to generate QR. Retrying...";
+          setTimeout(fetchQR, 5000);
+        });
+    }
+
+    // Start fetching QR
+    fetchQR();
+  </script>
+</body>
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>♔ ᴍᴀʜᴀᴄʜɪ-хᴅ | ᴘᴀɪʀ ʏᴏᴜʀ ʙᴏᴛ</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text: #1a1a1a;
+      --accent: #4998FF;
+      --accent-hover: #3a7ed8;
+      --border: #ddd;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --input-bg: #f9f9f9;
+      --btn-text: #ffffff;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0d1b2a;
+      --bg-secondary: #1b263b;
+      --text: #e0e1dd;
+      --accent: #71c9ce;
+      --accent-hover: #5cbcbf;
+      --border: #415a77;
+      --shadow: rgba(0, 0, 0, 0.4);
+      --input-bg: #132032;
+      --btn-text: #ffffff;
+    }
+
+    [data-theme="neon"] {
+      --bg-primary: #100520;
+      --bg-secondary: #1e0a3c;
+      --text: #e4aaff;
+      --accent: #bd0aff;
+      --accent-hover: #9a00d4;
+      --border: #6a00ff;
+      --shadow: rgba(189, 10, 255, 0.3);
+      --input-bg: #2a0f50;
+      --btn-text: #ffffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      padding: 25px;
+    }
+
+    .card {
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 10px 30px var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      font-size: 2.5rem;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: var(--text);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      color: var(--text);
+      opacity: 0.8;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+      background: var(--bg-secondary);
+      padding: 6px;
+      border-radius: 30px;
+      border: 1px solid var(--border);
+    }
+
+    .theme-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      background: var(--bg-secondary);
+      color: var(--text);
+    }
+
+    .theme-btn.active {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    input#number {
+      width: 100%;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 1.05rem;
+      outline: none;
+    }
+
+    input#number:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(73, 152, 255, 0.2);
+    }
+
+    button#submit {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(45deg, var(--accent), var(--accent-hover));
+      color: var(--btn-text);
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    button#submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #pair {
+      margin-top: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      color: var(--accent);
+      word-break: break-all;
+      text-align: left;
+    }
+
+    #waiting-message {
+      display: none;
+      color: var(--accent);
+      font-style: italic;
+      margin-top: 10px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .quote {
+      font-style: italic;
+      color: var(--accent);
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 500px) {
+      .container {
+        padding: 15px;
+      }
+      .card {
+        padding: 20px;
+      }
+      .theme-toggle {
+        top: 10px;
+        right: 10px;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="theme-toggle">
+    <button class="theme-btn active" data-theme="light" title="Light Mode"><i class="fas fa-sun"></i></button>
+    <button class="theme-btn" data-theme="dark" title="Dark Mode"><i class="fas fa-moon"></i></button>
+    <button class="theme-btn" data-theme="neon" title="Neon Mode"><i class="fas fa-bolt"></i></button>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <header>
+        <div class="logo"><i class="fas fa-crown"></i></div>
+        <h1>♔ ᴍᴀʜᴀᴄʜɪ-хᴅ | ᴘᴀɪʀɪɴɢ</h1>
+        <p class="subtitle">Enter your WhatsApp number with country code to generate your pairing code.</p>
+      </header>
+
+      <div class="form-group">
+        <input type="tel" id="number" placeholder="923444844060" />
+      </div>
+
+      <button id="submit">ɢᴇɴᴇʀᴀᴛᴇ ᴄᴏᴅᴇ</button>
+      <p id="waiting-message">ʙᴇ ᴘᴀᴛɪᴇɴᴛ, ʏᴏᴜ'ʟʟ ʀᴇᴄᴇɪᴠᴇ ʏᴏᴜʀ ᴄᴏᴅᴇ sᴏᴏɴ...</p>
+      <div id="pair"></div>
+
+      <footer>
+        <p>
+          Follow us: 
+          <a href="https://whatsapp.com/channel/0029Vb2J9C91dAw7vxA75y2V" target="_blank">Channel 1</a> | 
+          <a href="https://whatsapp.com/channel/0029VbBD719C1Fu3FOqzhb2R" target="_blank">Channel 2</a>
+        </p>
+        <p class="quote">"La meilleure vengeance c'est de leur montrer que ta vie s'améliore après leur départ."</p>
+      </footer>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"></script>
+  <script>
+    // Theme Toggle
+    const themeBtns = document.querySelectorAll('.theme-btn');
+    const html = document.documentElement;
+
+    function setActiveTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      themeBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === theme);
+      });
+      localStorage.setItem('theme', theme);
+    }
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setActiveTheme(savedTheme);
+
+    themeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        setActiveTheme(btn.dataset.theme);
+      });
+    });
+
+    // Copy to clipboard
+    async function copyCode(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        const pairEl = document.getElementById('pair');
+        pairEl.innerHTML = '<span style="color:green">COPIED! ✅</span>';
+        setTimeout(() => {
+          pairEl.innerHTML = `<font onclick="copyCode('${text}')" style="color:var(--accent);cursor:pointer">${text}</font>`;
+        }, 1000);
+      } catch (err) {
+        alert('Failed to copy. Please try manually.');
+      }
+    }
+
+    // Form handling
+    const submitBtn = document.getElementById('submit');
+    const numberInput = document.getElementById('number');
+    const resultDiv = document.getElementById('pair');
+    const waitingMsg = document.getElementById('waiting-message');
+
+    submitBtn.addEventListener('click', async () => {
+      const rawNumber = numberInput.value.replace(/[^0-9]/g, '');
+      resultDiv.innerHTML = '';
+      waitingMsg.style.display = 'none';
+
+      if (!rawNumber) {
+        resultDiv.innerHTML = '<span style="color:red">⚠️ Please enter a valid number</span>';
+        return;
+      }
+
+      if (rawNumber.length < 10 || rawNumber.length > 15) {
+        resultDiv.innerHTML = '<span style="color:red">⚠️ Invalid number length</span>';
+        return;
+      }
+
+      // Format number with spaces
+      let formatted = '+' + rawNumber;
+      if (rawNumber.length > 3) {
+        formatted = '+' + rawNumber.slice(0, 3) + ' ' + rawNumber.slice(3);
+      }
+      if (rawNumber.length > 6) {
+        const mid = rawNumber.length > 9 ? 6 : 5;
+        formatted = formatted.slice(0, 5) + ' ' + formatted.slice(5, 5 + mid) + ' ' + formatted.slice(5 + mid);
+      }
+
+      numberInput.value = formatted;
+      waitingMsg.style.display = 'block';
+
+      try {
+        const res = await axios.get(`/code?number=${rawNumber}`);
+        const code = res.data.code || 'Service unavailable';
+        resultDiv.innerHTML = `
+          <font onclick="copyCode('${code}')" style="color:var(--accent); font-weight:bold; cursor:pointer;">
+            CODE: <span style="color:var(--text);">${code}</span>
+          </font>
+        `;
+      } catch (err) {
+        resultDiv.innerHTML = '<span style="color:red">❌ Failed to generate code. Try again.</span>';
+      } finally {
+        waitingMsg.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
