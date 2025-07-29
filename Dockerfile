@@ -1,5 +1,5 @@
 # Use official Node.js image
-FROM node:20-buster-slim
+FROM node:20-buster
 
 # Set the working directory inside the container
 WORKDIR /app
