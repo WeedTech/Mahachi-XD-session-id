@@ -1,33 +1,23 @@
 const express = require('express');
-const path = require('path');
 const app = express();
-
-const __path = process.cwd();
+__path = process.cwd()
+const bodyParser = require("body-parser");
 const PORT = process.env.PORT || 8000;
-
-// Increase EventEmitter limit if needed
+let server = require('./qr'),
+  code = require('./pair');
 require('events').EventEmitter.defaultMaxListeners = 500;
-
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-app.use('/qr', require('./qr'));
-app.use('/code', require('./pair'));
-
-app.get('/pair', (req, res) => {
-  res.sendFile(path.join(__path, 'pair.html'), (err) => {
-    if (err) res.status(404).send('File not found');
-  });
-});
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__path, 'main.html'), (err) => {
-    if (err) res.status(404).send('File not found');
-  });
-});
-
+app.use('/qr', server);
+app.use('/code', code);
+app.use('/pair', async (req, res, next) => {
+  res.sendFile(__path + '/pair.html')
+})
+app.use('/', async (req, res, next) => {
+  res.sendFile(__path + '/main.html')
+})
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+  console.log(`Server running on http://localhost:` + PORT)
+})
 
-module.exports = app;
+module.exports = app
